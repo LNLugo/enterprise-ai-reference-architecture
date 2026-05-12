@@ -1,6 +1,6 @@
-this is a placeholder for ai-agents
+This is a placeholder for ai-agents
 very important :
-Eaach folder should have : 
+Each folder should have : 
 
 a README.md
 diagrams
