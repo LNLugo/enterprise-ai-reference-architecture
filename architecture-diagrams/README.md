@@ -1,91 +1,47 @@
-# Fitness Passport RAG Chatbot
+# 𝐄𝐧𝐭𝐞𝐫𝐩𝐫𝐢𝐬𝐞 𝐃𝐚𝐭𝐚 𝐀𝐫𝐜𝐡𝐢𝐭𝐞𝐜𝐭𝐮𝐫𝐞 𝐟𝐨𝐫 𝐀𝐈 𝐀𝐠𝐞𝐧𝐭𝐬
 
-A Retrieval-Augmented Generation (RAG) system that powers a customer support chatbot for Fitness Passport. This project scrapes FAQ data from a Freshdesk support page, processes and embeds the data using Sentence Transformers, stores it in ChromaDB, and finally leverages OpenAI's GPT model to generate context-aware responses via a Streamlit interface.
+AI agents don’t fail because of models. They fail because of poor data architecture.
+If the data layer isn’t structured, governed, and domain-aware, even the best models will struggle.
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Scraping FAQs](#scraping-faqs)
-  - [Running the Chatbot](#running-the-chatbot)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
+AI agents are only as powerful as the 𝐃𝐚𝐭𝐚 𝐀𝐫𝐜𝐡𝐢𝐭𝐞𝐜𝐭𝐮𝐫𝐞 behind them.
+Most organizations focus on models.
 
-## Overview
+But 𝐄𝐧𝐭𝐞𝐫𝐩𝐫𝐢𝐬𝐞 𝐀𝐈 success actually depends on how data is structured, governed, and delivered to agents.
 
-This repository demonstrates a complete RAG implementation:
-- **Data Scraping**: Extracts FAQs using Python's `requests` and `BeautifulSoup`.
-- **Data Handling**: Cleans, chunks, and embeds the scraped data with Sentence Transformers.
-- **Retrieval & Query Processing**: Stores embeddings in ChromaDB and retrieves context for user queries.
-- **Response Generation**: Constructs a contextual prompt for OpenAI’s GPT and generates answers.
-- **Chatbot Interface**: Provides a user-friendly interface using Streamlit.
+𝐇𝐞𝐫𝐞 𝐢𝐬 𝐚 𝐬𝐢𝐦𝐩𝐥𝐢𝐟𝐢𝐞𝐝 𝐛𝐥𝐮𝐞𝐩𝐫𝐢𝐧𝐭 𝐮𝐬𝐞𝐝 𝐢𝐧 𝐦𝐨𝐝𝐞𝐫𝐧 𝐄𝐧𝐭𝐞𝐫𝐩𝐫𝐢𝐬𝐞 𝐀𝐈 𝐩𝐥𝐚𝐭𝐟𝐨𝐫𝐦𝐬:
 
-## Features
+𝟏. 𝐆𝐨𝐯𝐞𝐫𝐧𝐚𝐧𝐜𝐞 & 𝐒𝐞𝐜𝐮𝐫𝐢𝐭𝐲 𝐋𝐚𝐲𝐞𝐫
+AI systems start with strong governance. 
+Identity, monitoring, and compliance must be centralized. 
+Tools like Microsoft Entra, Defender, Policy, and Monitor ensure secure access and visibility.
 
-- **Modular Codebase**: Separate modules for scraping, data handling, query processing, and UI.
-- **Robust Error Handling**: Logs and handles errors gracefully during data extraction.
-- **Persistent Storage**: Uses ChromaDB to persist embeddings and document collections.
-- **Real-time Interaction**: Dynamic chatbot interface for real-time query response generation.
+𝟐. 𝐏𝐥𝐚𝐭𝐟𝐨𝐫𝐦 𝐋𝐚𝐧𝐝𝐢𝐧𝐠 𝐙𝐨𝐧𝐞 
+This layer organizes the cloud environment. 
+It defines management groups for security, identity, connectivity, and operations. 
+Think of it as the control plane for the entire AI platform.
 
-## Project Structure
+𝟑. 𝐀𝐩𝐩𝐥𝐢𝐜𝐚𝐭𝐢𝐨𝐧 𝐋𝐚𝐧𝐝𝐢𝐧𝐠 𝐙𝐨𝐧𝐞𝐬
+Separate environments run different workloads and data domains. 
+Data platforms like Azure Databricks and Foundry power analytics and AI applications.
 
-├── `app.py` # Main Streamlit application integrating the RAG flow. <br>
-├── `data_handler.py` # Handles data loading, chunking, embedding generation, and ChromaDB integration. <br>
-├── `scraper.py` # Scrapes FAQ data from the Freshdesk support page. <br>
-├── `utils.py` # Contains functions for prompt building and OpenAI API integration. <br>
-├── output/ # Directory where scraped FAQs are stored (faqs.txt and faqs.json). <br>
-├── chroma_db/ # Directory used by ChromaDB for persistent storage. <br>
-├── `requirements.txt` # Required Python packages. <br>
-└── `README.md` # This file.<br>
+𝟒. 𝐔𝐧𝐢𝐟𝐢𝐞𝐝 𝐃𝐚𝐭𝐚 𝐋𝐚𝐤𝐞
+Enterprise data is consolidated into a single lake such as Microsoft Fabric OneLake. 
+This becomes the central knowledge layer for analytics and AI systems.
 
+𝟓. 𝐈𝐧𝐭𝐞𝐥𝐥𝐢𝐠𝐞𝐧𝐜𝐞 𝐋𝐚𝐲𝐞𝐫
+Platforms like Microsoft Fabric provide analytics, data science, warehousing, and visualization. 
+Fabric IQ and Data Agents turn datasets into structured knowledge for AI.
 
+𝟔. 𝐀𝐈 𝐀𝐠𝐞𝐧𝐭 𝐋𝐚𝐲𝐞𝐫 
+Tools like Copilot Studio and Foundry Agents interact directly with enterprise data. 
+Indexes, datasets, and semantic layers become the agent’s knowledge base.
 
-## Installation
+𝟕. 𝐃𝐨𝐦𝐚𝐢𝐧-𝐁𝐚𝐬𝐞𝐝 𝐃𝐚𝐭𝐚 𝐀𝐫𝐜𝐡𝐢𝐭𝐞𝐜𝐭𝐮𝐫𝐞
+Instead of one massive dataset, data is organized by business domains: 
+HR, marketing, finance, operations, and product teams.
 
-1. **Clone the Repository:**
+𝟖. 𝐌𝐮𝐥𝐭𝐢-𝐒𝐨𝐮𝐫𝐜𝐞 𝐃𝐚𝐭𝐚 𝐈𝐧𝐠𝐞𝐬𝐭𝐢𝐨𝐧
+Enterprise platforms integrate data from everywhere: 
+Microsoft 365, Dataverse, on-prem systems, and multi-cloud storage like AWS S3 or Google Cloud.
 
-   ```
-   git clone https://github.com/wandabwa2004/LLMs.git
-   cd RAG_Fitness_First
-   ```
-
-2. **Create a Virtual Environment:**
-```
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-3. Install the Dependencies:
-```pip install -r requirements.txt```
-
-## Usage
-1. Scraping FAQs
-To scrape FAQs from the Freshdesk support page and save them to disk, run:
-```python scraper.py```
-The scraped FAQs will be saved in both output/faqs.txt and output/faqs.json.
-
-2. Running the Chatbot
-To launch the chatbot application:
-
-Make sure your scraped data is available in the output folder.
-Set your OpenAI API key as an environment variable or via the Streamlit sidebar.
-
-3. Run the Streamlit app:
-```streamlit run app.py```
-
-A browser window will open displaying the chatbot interface. Enter your query, and the application will retrieve the relevant FAQ context and generate a response using OpenAI's API.
-
-## Deployment
-For local testing, the above instructions suffice. For cloud deployment, consider the following:
-
-Containerization: Use Docker to containerize the application.
-Cloud Platforms: Deploy on AWS, GCP, or Azure. Make sure to securely manage the OPENAI_API_KEY using cloud secrets management.
-Persistent Storage: If deploying horizontally, use cloud-based storage for the chroma_db directory.
-
-## Contributing
-Contributions are welcome! Please feel free to open issues or submit pull requests if you have improvements or bug fixes.
-
-## License
-This project is licensed under the MIT License.
+ 
