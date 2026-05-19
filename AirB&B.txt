@@ -1,0 +1,231 @@
+ Design AirBnB
+
+ 
+1. Problem Definition and Scope
+We are designing a global online marketplace that connects Hosts, who want to rent out their properties, with Guests, who are looking for accommodations.
+Main User Groups:
+* Hosts: List properties, manage availability/pricing, and accept bookings.
+* Guests: Search for properties by location and date, view details, and make reservations.
+Scope:
+We will focus on the Core Rental Experience.
+* In-Scope: Listing management, Search (Location + Date), Viewing listing details, and the Booking transaction flow.
+* Out of Scope: Payments integration (we assume a generic Payment Service), Reviews/Ratings system, Messaging/Chat, and "Experiences" (activities).
+
+2. Clarify functional requirements
+Must Have:
+* Host - Create Listing: Hosts can publish a listing with metadata (title, description, price) and photos.
+* Guest - Search: Guests can search for listings by location (city or coordinates), date range, and number of guests.
+* Guest - View Details: Guests can see full property details, amenities, and host information.
+* Guest - Book: Guests can reserve a property for a specific date range.
+* Inventory Management: The system must strictly prevent double bookings (two guests booking the same property for the same dates).
+Nice to Have:
+* Map View: Interactive map showing search results.
+* Dynamic Pricing: Hosts can set different prices for weekends or holidays.
+
+3. Clarify non-functional requirements
+Scale & Volume:
+* Users: 100 Million Monthly Active Users (MAU).
+* Listings: ~10 Million active listings worldwide.
+* Read vs Write: Extremely Read Heavy. Guests browse dozens of listings for every 1 booking made. Ratio ? 1000:1.
+Performance:
+* Search Latency: Low (< 300ms). Search is the primary discovery tool.
+* Booking Latency: Moderate (~2 seconds) is acceptable to ensure data consistency.
+Consistency:
+* Search: Eventual Consistency is acceptable. (If a host updates a description, a few seconds delay in search results is fine).
+* Booking: Strong Consistency is mandatory. Double bookings are a critical failure.
+Availability:
+* 99.99% for Search (High Availability).
+* 99.9% for Booking (Favor Consistency over Availability in network partitions).
+
+4. Back of the envelope estimates
+Traffic Estimates:
+* Daily Active Users (DAU): Assume 10% of MAU = 10 Million DAU.
+* Search Volume: Assume avg 10 searches/user/day.
+o  searches/day.
+o  QPS average.
+o Peak QPS (roughly 5x average)  QPS.
+* Booking Volume: Assume 1% conversion.
+o  bookings/day.
+o  TPS. (Write volume is very low, but logic is critical).
+Storage Estimates:
+* Metadata: 10M listings x 10KB (text) = 100 GB. Fits in memory/database easily.
+* Images: 10M listings x 10 photos x 2MB = 200 TB.
+o Requires Object Storage (S3) and CDN.
+
+5. API design
+We will use a REST API.
+1. Search Listings
+* GET /v1/listings/search
+* Params: lat, long, radius, check_in, check_out, guests, page.
+* Response: JSON list of listing summaries (id, title, price, thumbnail_url, rating).
+2. Get Listing Details
+* GET /v1/listings/{listing_id}
+* Response: Full details (photos, amenities, description, host info).
+3. Create Booking
+* POST /v1/bookings
+* Body: { listing_id, guest_id, check_in, check_out, payment_token, idempotency_key }
+* Response: { booking_id, status: "CONFIRMED" }
+* Errors: 409 Conflict (if dates are taken), 402 Payment Required.
+4. Create Listing
+* POST /v1/listings
+* Body: { title, description, location, price, amenities, photos: [...] }
+6. High level architecture
+We will use a Microservices architecture to separate the Search (Read-Heavy, Complex) from Booking (Transactional, Critical).
+Component Roles:
+1. Search Service: Handles queries. Backed by Elasticsearch (ES) for geospatial and keyword capabilities.
+2. Booking Service: Handles reservation logic. Backed by PostgreSQL (Master) for ACID transactions.
+3. Listing Service: Serves property details. Backed by PostgreSQL (Read Replicas) and Redis.
+4. CDN (CloudFront): Serves images to reduce latency and bandwidth on origin servers.
+5. Message Queue (Kafka): Used to sync updates from the Booking/Listing DB to the Elasticsearch index asynchronously.
+
+7. Data model
+We use PostgreSQL as the source of truth because bookings require transactions. We use Elasticsearch as a secondary index for search.
+Relational Schema (Postgres):
+1. Users
+o id (PK), name, email, password_hash.
+2. Listings
+o id (PK), host_id (FK), title, description, price, lat, long.
+o Index: host_id.
+3. Bookings
+o id (PK), listing_id (FK), guest_id (FK), start_date, end_date, status (CONFIRMED, CANCELLED).
+o Index: listing_id, start_date, end_date.
+Search Document (Elasticsearch):
+* We denormalize data into a JSON document for fast searching.
+* {"id": 101,
+* "location": { "lat": 40.7, "lon": -74.0 },
+* "amenities": ["wifi", "pool"],
+* "booked_dates": ["2023-10-01", "2023-10-02", ...]}
+* 
+* Note: Storing booked_dates in ES allows us to filter out unavailable homes before checking the database.
+8. Core flows end to end
+In a large-scale system like Airbnb, we rarely have a single monolithic server handling a request. Instead, a request ripples through multiple services.
+We will dissect the three most critical flows: Search (Read), Booking (Write), and Synchronization (Async).
+Flow 1: Guest Search (The "Read" Path)
+Goal: Return relevant listings quickly (< 300ms) even if the data is slightly stale.
+This flow prioritizes Latency and Availability over strict Consistency.
+1. Request Ingestion: The client (Mobile App/Browser) sends a GET request to the API Gateway.
+* Query: ?lat=40.7128&long=-74.0060&checkin=2023-10-01&checkout=2023-10-05
+* The Load Balancer routes this to the Search Service.
+2. The "Split-Brain" Query Strategy: We do not query the main database (PostgreSQL) for search. Postgres is terrible at geospatial queries combined with full-text search at scale. Instead, we query Elasticsearch (ES).
+* Step A: Filtering (Elasticsearch): The Search Service queries the ES index.
+* Filter 1 (Geo): Find listing IDs where location is within 10km of coordinates (using QuadTree or Geohash).
+* Filter 2 (Availability): Exclude listings where booked_dates overlaps with the user's requested range.
+* Result: ES returns a lightweight list of Listing IDs (e.g., [101, 102, 105]). It does not return the full description, amenities, or high-res photo URLs, to keep the ES payload small.
+3. Data Hydration (Redis + Database): Now that we have the IDs, we need to show the user the actual content.
+* The Search Service takes the list of IDs and checks the Redis Cache (Listing Service).
+* Hit: Retrieve listing title, price, and thumbnail URL from memory.
+* Miss: If not in Redis, fetch from the PostgreSQL Read Replica and populate Redis.
+4. Response: The aggregated data is returned to the user. This "Query (ES) then Fetch (Redis)" pattern ensures our search engine stays fast and lean.
+
+Flow 2: Guest Creates Booking (The "Write" Path)
+Goal: Ensure no two people book the same room for the same date.
+This flow prioritizes Consistency above all else. We cannot have a "race condition" where User A and User B both pay for the same room.
+1. Reservation Request: The user clicks "Book". The client sends a POST request with an idempotency_key (a unique UUID generated by the frontend, e.g., uuid-123).
+2. The Transaction Boundary (PostgreSQL): The Booking Service opens a database transaction. This is the critical moment.
+* Optimistic vs. Pessimistic Locking: For a high-contention system (like ticket sales), we might use Redis. But for housing (lower volume, high value), we use Pessimistic Locking on the Database.
+* The Lock: We explicitly lock the rows to prevent other concurrent transactions from reading or writing to them until we are done.
+-- Pseudo-SQL
+BEGIN;
+
+-- Check for overlaps and LOCK the listing row
+-- This forces other booking attempts for Listing 101 to WAIT
+SELECT * FROM listings 
+WHERE id = 101 
+FOR UPDATE; 
+
+-- Check if dates are already taken in the bookings table
+SELECT count(*) FROM bookings 
+WHERE listing_id = 101 
+AND (start_date < requested_end AND end_date > requested_start);
+
+-- If count > 0 -> ROLLBACK (Return Error: "Dates just taken")
+-- If count == 0 -> PROCEED
+3. State 1: PENDING: We insert a record into the bookings table with status PENDING. We establish a "reservation timer" (e.g., 10 minutes) in Redis. If the user doesn't pay in 10 minutes, we release the dates.
+4. Payment Processing: The Booking Service calls the external Payment Service (Stripe/PayPal).
+* Note: We do this outside the DB lock if possible, or strictly manage the timeout, to avoid holding database connections open for too long.
+* If Payment Fails: Update booking status to FAILED.
+* If Payment Succeeds: Update booking status to CONFIRMED.
+5. Commit: The transaction is committed. The room is officially sold. The user sees a "Success" screen.
+
+Flow 3: Asynchronous Synchronization (The Bridge)
+Goal: Update the Search Index so other users stop seeing this home as "Available".
+Immediately after Flow 2 (Booking) finishes, the PostgreSQL database has the correct data, but Elasticsearch (used in Flow 1) is outdated. It still thinks the home is free.
+1. Change Data Capture (CDC): We do not want the Booking Service to manually update Elasticsearch (dual writes are prone to errors). Instead, we use the "Sidecar" pattern.
+* When the Booking Database commits the CONFIRMED row, a connector (like Debezium) reads the database Write-Ahead Log (WAL).
+* It publishes an event to a Kafka topic: booking_events.
+* Payload: { "event": "BOOKING_CONFIRMED", "listing_id": 101, "dates": [...] }
+2. Search Index Consumer: A separate Indexer Service subscribes to the Kafka topic.
+* It picks up the message.
+* It updates the document in Elasticsearch to add the new dates to the booked_dates array.
+3. Eventual Consistency: There is a lag of roughly 1 to 5 seconds between the DB Commit and the Elasticsearch update.
+* Scenario: User A books the home. 2 seconds later, User B searches.
+* Edge Case: User B might still see the home in search results (because ES isn't updated yet).
+* Resolution: When User B clicks "Book", Flow 2 (The DB Lock) will catch the overlap and reject the request. This is an acceptable trade-off for system scalability.
+
+9. Caching and read performance
+1. Listing Details (Redis):
+* Key: listing:{id}.
+* Value: Full JSON details.
+* TTL: 1 hour.
+* Strategy: Cache-Aside. If host updates listing, invalidate cache.
+2. Image Caching (CDN):
+* Images are heavy (2MB). Serving them from API servers would crush bandwidth.
+* We upload to S3 -> CDN caches them at the edge.
+* Browser caches them locally using Cache-Control: max-age=31536000.
+3. Search Availability:
+* We rely on Elasticsearch's speed. We do not cache full search results as params vary too much.
+10. Storage, indexing and media
+Primary Storage (Postgres):
+* Stores the authoritative state of bookings.
+* Uses Read Replicas to scale "View Listing" traffic.
+Search Index (Elasticsearch):
+* Uses Geo-Spatial Indexing (QuadTree/Geohash) to efficiently find "points in polygon" or "points within radius".
+* The index is "Eventually Consistent". It might be 1-2 seconds behind the DB. This is acceptable; if a user tries to book a room that was just taken, the DB transaction (Step 8) will catch it.
+Media:
+* Host uploads image -> API generates Presigned S3 URL -> Client uploads directly to S3.
+* S3 triggers Lambda -> Resizes image (thumbnail, mobile, desktop) -> Updates DB.
+11. Scaling strategies
+Database Sharding:
+* A single Postgres node can hold ~1TB comfortably. 10M listings + bookings will eventually exceed this or hit write limits.
+* Shard Key: listing_id.
+* All data for Listing 101 (bookings, details) lives on Shard A.
+* This ensures our "Lock" transaction remains local to one shard (fast).
+Search Scaling:
+* Elasticsearch is distributed. We partition the index.
+* Strategy: Shard by Listing ID or Geographic Region (e.g., Index-US-East, Index-Europe).
+Handling "Hot" Listings:
+* If a listing goes viral, many users might hit the SELECT ... FOR UPDATE lock.
+* Improvement: Add a "Temporary Hold" in Redis.
+o When user clicks "Book", set Redis key: listing_101_dates_oct1_5 with TTL 5 mins.
+o If key exists, other users see "Someone is booking this" immediately, saving DB load.
+12. Reliability, failure handling and backpressure
+Idempotency:
+* Crucial for payments.
+* Client generates a UUID idempotency_key when clicking "Book".
+* Booking Service checks if it has processed this Key before. If yes, return stored result. Prevents double charging on network timeouts.
+Circuit Breakers:
+* If Elasticsearch fails, the Search Service detects timeouts and "trips" the breaker.
+* Fallback: Show "Trending Homes" from Redis or allow simple City-based SQL search (degraded mode) instead of crashing.
+Graceful Degradation:
+* If Reviews Service is down, load the listing page without reviews. Do not block the main flow.
+13. Security, privacy and abuse
+Security:
+* HTTPS everywhere.
+* PCI-DSS: Don't handle raw credit cards. Use tokenization (Stripe Elements).
+Privacy:
+* Location Fuzzing: We store exact lat/long, but API returns a "fuzzed" location (random point within 500m) until booking is confirmed. Protects host safety.
+Abuse:
+* Rate Limiting: Token Bucket in Redis. Limit calls to /search to prevent scraping.
+* Fraud: Background workers analyze booking patterns (e.g., same guest booking 5 houses for same night) and flag for manual review.
+14. Bottlenecks and next steps
+Bottleneck: Index Synchronization Lag
+* Issue: User books a home. DB is updated. Kafka lags by 5 seconds. Search still shows home as "Available".
+* Mitigation: This is largely unavoidable in distributed systems. We rely on the DB check at the very end to catch this ("Optimistic UI").
+Bottleneck: Global Search
+* Issue: Searching "Anywhere in the world" without a location is expensive.
+* Mitigation: Force users to select a region (e.g., "Europe") or show curated "Inspirational" lists pre-computed in Redis.
+Summary:
+* We separated Read (Search) and Write (Booking) paths.
+* We used Elasticsearch for rich discovery and PostgreSQL with Row Locking for transactional integrity.
+* We scaled storage using Sharding by Listing ID and handled media with S3 + CDN.
+
