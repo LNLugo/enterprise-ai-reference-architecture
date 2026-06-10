@@ -13,8 +13,7 @@
 
 ### 👋 About Me
 
-15+ years architecting cloud-native platforms and leading enterprise modernization. I write deep technical content on AI Agents, RAG, MCP, LLMs, and Azure Cloud—sharing what I learn with the developer community.
-Principal Engineer and Azure Developer Expert (ADE). I lead large-scale cloud transformation and enterprise modernization, specializing in re-platforming legacy systems and designing resilient, cloud-native architectures on Azure Cloud Platform (GCP). I also write technical content on AI Agents and Azure Cloud, sharing what I learn with the developer community.
+15+ years architecting cloud-native platforms and leading enterprise modernization. I write deep technical content on AI Agents, RAG, MCP, LLMs, and Azure Cloud. I lead large-scale cloud transformation and enterprise modernization, specializing in re-platforming legacy systems and designing resilient, cloud-native architectures on Azure Cloud Platform & AWS. I also write technical content on AI Agents and Azure Cloud, sharing what I learn with the community.
 
 <p align="left">
   <a href="https://x.com/Lugo">
