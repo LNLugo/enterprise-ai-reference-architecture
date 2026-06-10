@@ -35,21 +35,22 @@
 
 ---
 
-### ⭐ Featured: Google ADK Masterclass
+### ⭐ Featured: Azure ADK Masterclass - Coming soon
 
 <a href="https://arjunprabhulal.com/courses/adk-masterclass-hands-on-series/">
   <img src="https://arjunprabhulal.com/assets/images/blog/adk-masterclass-hands-on-series.png" alt="ADK Masterclass" width="300">
 </a>
 
-**A free, 20-module hands-on series** for building AI agents with Google's Agent Development Kit.
+**A free, 20-module hands-on series** for building AI agents with Azure's Agent Development Kit.
 
 | Module | Topics |
 |--------|--------|
 | **Foundations** | 1. [Getting Started](https://arjunprabhulal.com/adk-getting-started/)<br>2. [Agent Setup](https://arjunprabhulal.com/adk-setting-up-agent/)<br>3. [Visual Builder](https://arjunprabhulal.com/google-adk-visual-agent-builder/) |
 | **Orchestration** | 4. [LLM Agents](https://arjunprabhulal.com/adk-llm-agents/)<br>5. [Workflow Agents](https://arjunprabhulal.com/adk-workflow-sequential-loop-parallel/)<br>6. [Multi-Agent Systems](https://arjunprabhulal.com/adk-multi-agent-systems/) |
-| **Tools** | 7. [Built-in Tools](https://arjunprabhulal.com/adk-built-in-tools/)<br>8. [RAG](https://arjunprabhulal.com/adk-builtin-tools-rag/)<br>9. [Vertex Search](https://arjunprabhulal.com/adk-builtin-tools-vertex-search/)<br>10. [Custom Functions](https://arjunprabhulal.com/adk-custom-tools-function/)<br>11. [OpenAPI](https://arjunprabhulal.com/adk-custom-tools-openapi/)<br>12. [Multi-Tool](https://arjunprabhulal.com/adk-multi-tool-agent/)<br>13. [Third-Party MCP](https://arjunprabhulal.com/adk-third-party-tools-github/)<br>14. [MCP Toolbox](https://arjunprabhulal.com/adk-mcp-toolbox/) |
+| **Tools**     | 7. [Built-in Tools](https://arjunprabhulal.com/adk-built-in-tools/)<br>8. [RAG](https://arjunprabhulal.com/adk-builtin-tools-rag/)<br>9. [Vertex Search](https://arjunprabhulal.com/adk-builtin-tools-vertex-search/)<br>10. [Custom Functions](https://arjunprabhulal.com/adk-custom-tools-function/)<br>11. [OpenAPI](https://arjunprabhulal.com/adk-custom-tools-openapi/)<br>12. [Multi-Tool](https://arjunprabhulal.com/adk-multi-tool-agent/)<br>13. [Third-Party MCP](https://arjunprabhulal.com/adk-third-party-tools-github/)<br>14. [MCP Toolbox](https://arjunprabhulal.com/adk-mcp-toolbox/) |
 | **Protocols** | 15. [Model Context Protocol](https://arjunprabhulal.com/adk-mcp-deep-dive/) |
 | **Core** | 16. [Sessions & State](https://arjunprabhulal.com/adk-sessions-state/)<br>17. [Context](https://arjunprabhulal.com/adk-context-management/)<br>18. [Callbacks](https://arjunprabhulal.com/adk-callbacks/)<br>19. [Artifacts](https://arjunprabhulal.com/adk-artifacts/)<br>20. [Events](https://arjunprabhulal.com/adk-events/) |
+
 ### 🚀 Personal Projects
 
 [![View Course](https://img.shields.io/badge/View_Full_Course-4285F4?style=for-the-badge)](https://arjunprabhulal.com/courses/adk-masterclass-hands-on-series/)
@@ -99,7 +100,7 @@
 ---
 
 ### 📝 Latest Articles
-### ⭐ Google ADK Masterclass
+### ⭐ Azure ADK Masterclass
 
 - [RAG Simplified with Gemini API's File Search Tool](https://arjunprabhulal.com/rag-simplified-with-filesearch-tool/)
 - [Build a RAG Agent using Google ADK and Vertex AI RAG Engine](https://medium.com/google-cloud/build-a-rag-agent-using-google-adk-and-vertex-ai-rag-engine-bb1e6b1ee09d)
