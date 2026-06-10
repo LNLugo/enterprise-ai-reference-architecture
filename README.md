@@ -1,4 +1,4 @@
- <div align="center">
+<div align="center">
 # Hey, I'm Luis N. Lugo 
 
 [![Website](https://img.shields.io/badge/arjunprabhulal.com-0066cc?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0OCA0OCI+PGNpcmNsZSBjeD0iMjQiIGN5PSIyNCIgcj0iMjMiIGZpbGw9IndoaXRlIi8+PHRleHQgeD0iMjQiIHk9IjMyIiBmb250LXNpemU9IjIxIiBmb250LXdlaWdodD0iOTAwIiBmaWxsPSIjMDA2NmNjIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5BUDwvdGV4dD48L3N2Zz4=)](https://arjunprabhulal.com)
