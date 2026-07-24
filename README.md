@@ -10,6 +10,28 @@
 </div>
 
 ---
+## 🏛️ Reference Architecture
+
+The **Enterprise Document Intelligence Platform (EDIP)** is the production reference implementation of the **Enterprise AI Reference Architecture (EAIRA)**.
+
+EAIRA defines the architectural principles, reference models, governance framework, and reusable patterns for building secure, scalable, and enterprise-ready AI platforms. EDIP demonstrates how those architectural concepts are implemented in a real-world Retrieval-Augmented Generation (RAG) application.
+
+**Enterprise AI Reference Architecture (EAIRA):**
+https://github.com/LNLugo/enterprise-ai-reference-architecture
+
+### Relationship Between the Projects
+
+| Enterprise AI Reference Architecture (EAIRA) | Enterprise Document Intelligence Platform (EDIP) |
+|----------------------------------------------|--------------------------------------------------|
+| Enterprise reference architecture | Production reference implementation |
+| Architecture principles | Working Python code |
+| C4 models | Executable system |
+| AI governance | Runtime implementation |
+| Reusable patterns | Applied design patterns |
+| Technology-agnostic | Technology-specific implementation |
+| Strategic guidance | Hands-on engineering |
+
+Together, these repositories demonstrate both the strategic architecture and the practical engineering required to build enterprise-grade AI solutions.
 
 ### 👋 About Me
 
