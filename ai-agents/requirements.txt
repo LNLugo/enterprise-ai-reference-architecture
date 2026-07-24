@@ -1,4 +1,0 @@
-streamlit
-chromadb
-sentence-transformers
-openai
