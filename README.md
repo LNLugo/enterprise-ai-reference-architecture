@@ -10,29 +10,46 @@
 </div>
 
 ---
-## 🏛️ Reference Architecture
+## 🏛️ Enterprise AI Ecosystem
 
-The **Enterprise Document Intelligence Platform (EDIP)** is the production reference implementation of the **Enterprise AI Reference Architecture (EAIRA)**.
+This repository is part of a larger Enterprise AI ecosystem.
 
-EAIRA defines the architectural principles, reference models, governance framework, and reusable patterns for building secure, scalable, and enterprise-ready AI platforms. EDIP demonstrates how those architectural concepts are implemented in a real-world Retrieval-Augmented Generation (RAG) application.
+### Enterprise AI Reference Architecture (EAIRA)
 
-**Enterprise AI Reference Architecture (EAIRA):**
-https://github.com/LNLugo/enterprise-ai-reference-architecture
+The **Enterprise AI Reference Architecture (EAIRA)** defines the blueprint for designing secure, scalable, governed, and enterprise-ready AI platforms.
 
-### Relationship Between the Projects
+It includes:
 
-| Enterprise AI Reference Architecture (EAIRA) | Enterprise Document Intelligence Platform (EDIP) |
-|----------------------------------------------|--------------------------------------------------|
-| Enterprise reference architecture | Production reference implementation |
-| Architecture principles | Working Python code |
-| C4 models | Executable system |
-| AI governance | Runtime implementation |
-| Reusable patterns | Applied design patterns |
-| Technology-agnostic | Technology-specific implementation |
-| Strategic guidance | Hands-on engineering |
+- Enterprise architecture principles
+- AI governance
+- Agentic AI patterns
+- Retrieval-Augmented Generation (RAG) reference architecture
+- Security and guardrails
+- AI observability
+- AI FinOps
+- C4 architecture models
+- Reference implementations and reusable patterns
 
-Together, these repositories demonstrate both the strategic architecture and the practical engineering required to build enterprise-grade AI solutions.
+👉 https://github.com/LNLugo/enterprise-ai-reference-architecture
 
+### Enterprise Document Intelligence Platform (EDIP)
+
+EDIP is the production implementation of EAIRA.
+
+It demonstrates how the architectural principles are translated into working software through:
+
+- Document ingestion
+- Intelligent chunking
+- Embedding generation
+- Vector search
+- Semantic retrieval
+- LLM orchestration
+- Evaluation framework
+- Enterprise testing
+- Observability
+- Production-ready engineering practices
+
+> **Architecture defines the blueprint. EDIP proves the blueprint works.**
 ### 👋 About Me
 
 15+ years architecting cloud-native platforms and leading enterprise modernization. I write deep technical content on AI Agents, RAG, MCP, LLMs, and Azure Cloud. I lead large-scale cloud transformation and enterprise modernization, specializing in re-platforming legacy systems and designing resilient, cloud-native architectures on Azure Cloud Platform & AWS. I also write technical content on AI Agents and Azure Cloud, sharing what I learn with the community.
