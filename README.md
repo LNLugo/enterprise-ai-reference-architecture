@@ -1,4 +1,4 @@
-# Enterprise AI Reference Architecture (EAIRA) - Louis
+# Enterprise AI Reference Architecture (EAIRA)
 
 A vendor-neutral reference architecture for designing secure, scalable and governed enterprise AI platforms.
 
